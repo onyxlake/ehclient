@@ -16,14 +16,14 @@ func (p *Parser) parseGalleryComments(root *goquery.Document) ([]*GalleryComment
 			text := node.Text()
 			i := strings.Index(text, "by:")
 			postedAtStr := text[:i-1]
-			userStr := text[i+1:]
+			userStr := text[i+4:]
 			postedAtStr = strings.TrimLeft(postedAtStr, "Posted on ")
 			postedAt, err := p.parseCommentTime(postedAtStr)
 			if err != nil {
 				return nil, newParserParseError("gallery_comment", "posted_at", postedAtStr, err)
 			}
 			comment.PostedAt = postedAt
-			comment.User = userStr
+			comment.User = strings.TrimSpace(userStr)
 		}
 
 		if node := s.FindMatcher(p.Single(".c5>span")); node.Length() != 0 {
