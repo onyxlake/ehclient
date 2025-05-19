@@ -41,7 +41,7 @@ func (p *Parser) parseGalleryComments(root *goquery.Document) ([]*GalleryComment
 		}
 
 		if node := s.FindMatcher(p.Single(".c6")); node.Length() != 0 {
-			comment.Content = node.Children().Nodes
+			comment.Content = node.Nodes[0]
 		}
 
 		if node := s.FindMatcher(p.Single(".c8>strong")); node.Length() != 0 {

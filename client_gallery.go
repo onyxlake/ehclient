@@ -56,7 +56,7 @@ type GalleryComment struct {
 	LastEditedAt *time.Time
 	User         string
 	Score        int
-	Content      []*html.Node
+	Content      *html.Node
 }
 
 type GetGalleryOption struct {
