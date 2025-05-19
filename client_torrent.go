@@ -41,3 +41,7 @@ func (c *Client) GetTorrent(gid int, token string) ([]Torrent, error) {
 
 	return c.parser.parseTorrent(doc)
 }
+
+func (c *Client) BuildTorrentUrl(gid int, hash string) string {
+	return fmt.Sprintf("https://ehtracker.org/get/%d/%s.torrent", gid, hash)
+}
