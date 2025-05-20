@@ -10,6 +10,7 @@ import (
 )
 
 type Page struct {
+	GalleryId   int
 	Page        int
 	Token       string
 	FileName    string

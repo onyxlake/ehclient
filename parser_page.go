@@ -9,8 +9,9 @@ import (
 )
 
 var (
-	_regShowKey = regexp.MustCompile(`showkey="(\S+)"`)
-	_regToken   = regexp.MustCompile(`startkey="(\S+)"`)
+	_regGalleryId = regexp.MustCompile(`gid=(\d+)`)
+	_regShowKey   = regexp.MustCompile(`showkey="(\S+)"`)
+	_regToken     = regexp.MustCompile(`startkey="(\S+)"`)
 )
 
 func (p *Parser) parsePage(doc *goquery.Document) (*Page, error) {
@@ -18,6 +19,15 @@ func (p *Parser) parsePage(doc *goquery.Document) (*Page, error) {
 
 	if node := doc.FindMatcher(p.Matcher("script[type]")).Eq(1); node.Length() != 0 {
 		script := node.Nodes[0].FirstChild.Data
+		if submatch := _regGalleryId.FindStringSubmatch(script); len(submatch) == 2 {
+			gid, err := strconv.Atoi(submatch[1])
+			if err != nil {
+				return nil, newParserParseError("page", "gid", submatch[1], err)
+			}
+			result.GalleryId = gid
+		} else {
+			return nil, newNodeNotFoundError("page", "gid")
+		}
 		if submatch := _regShowKey.FindStringSubmatch(script); len(submatch) == 2 {
 			result.ApiToken = submatch[1]
 		} else {
@@ -124,6 +134,14 @@ func (p *Parser) parsePageApi(resp *showPageResult) (*Page, error) {
 	var result Page
 	result.Page = resp.Page
 	result.Token = resp.Token
+
+	gidStr := resp.Uri[2:]
+	gidStr = gidStr[strings.Index(gidStr, "/")+1 : strings.Index(gidStr, "-")]
+	gid, err := strconv.Atoi(gidStr)
+	if err != nil {
+		return nil, newParserParseError("page", "gid", gidStr, err)
+	}
+	result.GalleryId = gid
 
 	if submatch := _regPrev.FindStringSubmatch(resp.NavHtml); len(submatch) == 3 {
 		page, err := strconv.Atoi(submatch[1])
